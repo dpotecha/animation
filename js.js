@@ -1,9 +1,9 @@
 const waveSlider = {
   waveSliderOptions: {
     images: ["img/1.jpeg", "img/2.jpeg", "img/3.jpeg"],
-    shift: 50,
-    dragRatio: 0.2,
-    speed: 1,
+    shift: 80,
+    dragRatio: 0.1,
+    speed: 0.4,
   },
   pixiApp: null,
   waveTicker: null,
@@ -84,18 +84,18 @@ const waveSlider = {
       if (!this.sliderStatus.isAnimated) {
         let sprite = this.slidesData.displacementSprites[index];
         let elapsed = 0;
-        let animationAmplitude = 300.0;
+        let animationAmplitude = 250.0;
         this.waveTicker.add((delta) => {
           sprite.y++;
           if (!this.sliderStatus.isUp) {
-            elapsed += delta;
+            elapsed += delta * 5;
           } else {
-            elapsed -= delta;
+            elapsed -= delta * 2.5;
           }
           filter.scale.x =
-            0.0 + Math.sin(elapsed / animationAmplitude) * 50.0;
+            0.0 + Math.sin(elapsed / animationAmplitude) * 40.0;
             filter.scale.y =
-            0.0 + Math.sin(elapsed / animationAmplitude) * 20.0;
+            0.0 + Math.sin(elapsed / animationAmplitude) * 25.0;
           if (sprite.y > sprite.height) {
             sprite.y = 0;
           }
@@ -227,21 +227,26 @@ const waveSlider = {
       nextSlide.offset = 1 + newSlideOffset;
       prevSlide.offset = newSlideOffset;
 
-      currentSlide.x =
-        slider.slidesData.startSlidePosition +
-        currentSlide.offset * slider.waveSliderOptions.shift;
+      currentSlide.x = Math.min(slider.waveSliderOptions.shift, Math.max(slider.slidesData.startSlidePosition +
+        currentSlide.offset * 2 * slider.waveSliderOptions.shift, -slider.waveSliderOptions.shift));
+
       nextSlide.x =
-        slider.slidesData.nextSlidePosition +
-        newSlideOffset * slider.waveSliderOptions.shift;
+        Math.max(slider.slidesData.nextSlidePosition +
+        newSlideOffset * 2 * slider.waveSliderOptions.shift, 0);
+
       prevSlide.x =
-        slider.slidesData.prevSlidePosition +
-        newSlideOffset * slider.waveSliderOptions.shift;
+        Math.min(slider.slidesData.prevSlidePosition +
+        newSlideOffset * 2 * slider.waveSliderOptions.shift, 0);
 
       currentSlide.alpha =
-        slider.slidesData.slideOpacity - Math.abs(currentSlide.offset);
+        slider.slidesData.slideOpacity - Math.abs(currentSlide.offset) * 2;
+
       nextSlide.alpha =
-        slider.slidesData.nextSlideOpacity + 1 - Math.abs(nextSlide.offset);
+        (slider.slidesData.nextSlideOpacity + 1 - Math.abs(nextSlide.offset)) * 2;
+
       prevSlide.alpha = slider.slidesData.prevSlideOpacity + prevSlide.offset;
+
+      console.log(nextSlide.alpha);
     }
   },
   onDragEnd: function () {
